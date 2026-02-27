@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cabo de Guerra Matemático - Lousa Digital</title>
+    <style>
+        :root { 
+            --cor-p1: #3498db; 
+            --cor-p2: #e67e22; 
+            --cor-confirmar: #27ae60;
+            --cor-limpar: #c0392b;
+            --bg: #121212; 
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; 
+            margin: 0; overflow: hidden; touch-action: none;
+            display: flex; flex-direction: column; align-items: center; height: 100vh;
+        }
+
+        /* MENU INICIAL */
+        #menu { 
+            display: flex; flex-direction: column; gap: 15px; padding-top: 40px; 
+            width: 100%; align-items: center; z-index: 10;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 5px; color: var(--cor-p1); }
+        .btn-nivel { 
+            width: 80%; max-width: 400px; padding: 18px; font-size: 1.3rem; cursor: pointer;
+            background: #222; color: white; border: 2px solid #444; border-radius: 12px;
+            transition: 0.2s; font-weight: bold;
+        }
+        .btn-nivel:hover { background: #333; border-color: var(--cor-p1); }
+        .btn-em { background: #2d1b4d; border-color: #6c5ce7; }
+
+        /* JOGO */
+        #jogo { display: none; width: 100vw; height: 100vh; flex-direction: column; align-items: center; justify-content: space-between; }
+        
+        #arena { 
+            width: 90%; height: 60px; background: #222; margin-top: 20px;
+            border-radius: 30px; position: relative; overflow: hidden; border: 4px solid #333;
+        }
+        #corda { 
+            position: absolute; width: 100%; height: 8px; background: #8b4513; top: 50%; transform: translateY(-50%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #marcador { 
+            width: 12px; height: 45px; background: red; position: absolute; left: 50%; top: 50%; 
+            transform: translate(-50%, -50%); border: 2px solid white; box-shadow: 0 0 15px red;
+        }
+
+        #questao-container { 
+            font-size: 4.5rem; font-weight: 900; margin: 10px 0; min-height: 120px; 
+            display: flex; align-items: center; justify-content: center; text-align: center;
+        }
+        sub { font-size: 2rem; vertical-align: sub; }
+        sup { font-size: 2rem; vertical-align: super; }
+
+        /* TECLADOS */
+        .area-jogadores { display: flex; width: 100%; justify-content: space-evenly; align-items: flex-end; padding-bottom: 30px; }
+        .painel-input { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        
+        .display-valor { 
+            font-size: 3rem; background: #000; width: 220px; height: 70px; 
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; 
+            border: 3px solid #444; font-family: monospace;
+        }
+        
+        .teclado { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .tecla { 
+            width: 75px; height: 75px; font-size: 1.8rem; font-weight: bold;
+            background: #333; color: white; border: none; border-radius: 10px; cursor: pointer;
+        }
+        .tecla:active { background: #555; transform: scale(0.92); }
+        .tecla-confirmar { background: var(--cor-confirmar); grid-column: span 2; font-size: 1.2rem; }
+        .tecla-limpar { background: var(--cor-limpar); }
+
+        .j1-label { color: var(--cor-p1); font-weight: bold; font-size: 1.2rem; }
+        .j2-label { color: var(--cor-p2); font-weight: bold; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <div id="menu">
+        <h1>Cabo de Guerra Matemático</h1>
+        <button class="btn-nivel" onclick="iniciarJogo(6)">6º Ano (Básico)</button>
+        <button class="btn-nivel" onclick="iniciarJogo(7)">7º Ano (Inteiros)</button>
+        <button class="btn-nivel" onclick="iniciarJogo(8)">8º Ano (Raiz/Potência)</button>
+        <button class="btn-nivel" onclick="iniciarJogo(9)">9º Ano (Equações)</button>
+        <button class="btn-nivel btn-em" onclick="iniciarJogo(10)">Ensino Médio (Log/Trig)</button>
+    </div>
+
+    <div id="jogo">
+        <div id="arena"><div id="corda"></div><div id="marcador"></div></div>
+        
+        <div id="questao-container">...</div>
+
+        <div class="area-jogadores">
+            <div class="painel-input">
+                <span class="j1-label">JOGADOR 1</span>
+                <div id="display-j1" class="display-valor"></div>
+                <div class="teclado">
+                    <button class="tecla" onclick="digitar(1, '1')">1</button>
+                    <button class="tecla" onclick="digitar(1, '2')">2</button>
+                    <button class="tecla" onclick="digitar(1, '3')">3</button>
+                    <button class="tecla" onclick="digitar(1, '4')">4</button>
+                    <button class="tecla" onclick="digitar(1, '5')">5</button>
+                    <button class="tecla" onclick="digitar(1, '6')">6</button>
+                    <button class="tecla" onclick="digitar(1, '7')">7</button>
+                    <button class="tecla" onclick="digitar(1, '8')">8</button>
+                    <button class="tecla" onclick="digitar(1, '9')">9</button>
+                    <button class="tecla" onclick="digitar(1, '-')">-</button>
+                    <button class="tecla" onclick="digitar(1, '0')">0</button>
+                    <button class="tecla" onclick="digitar(1, ',')">,</button>
+                    <button class="tecla tecla-limpar" onclick="limpar(1)">C</button>
+                    <button class="tecla tecla-confirmar" onclick="confirmar(1)">PUXAR!</button>
+                </div>
+            </div>
+
+            <div class="painel-input">
+                <span class="j2-label">JOGADOR 2</span>
+                <div id="display-j2" class="display-valor"></div>
+                <div class="teclado">
+                    <button class="tecla" onclick="digitar(2, '1')">1</button>
+                    <button class="tecla" onclick="digitar(2, '2')">2</button>
+                    <button class="tecla" onclick="digitar(2, '3')">3</button>
+                    <button class="tecla" onclick="digitar(2, '4')">4</button>
+                    <button class="tecla" onclick="digitar(2, '5')">5</button>
+                    <button class="tecla" onclick="digitar(2, '6')">6</button>
+                    <button class="tecla" onclick="digitar(2, '7')">7</button>
+                    <button class="tecla" onclick="digitar(2, '8')">8</button>
+                    <button class="tecla" onclick="digitar(2, '9')">9</button>
+                    <button class="tecla" onclick="digitar(2, '-')">-</button>
+                    <button class="tecla" onclick="digitar(2, '0')">0</button>
+                    <button class="tecla" onclick="digitar(2, ',')">,</button>
+                    <button class="tecla tecla-limpar" onclick="limpar(2)">C</button>
+                    <button class="tecla tecla-confirmar" onclick="confirmar(2)">PUXAR!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let posicao = 0, respostaCorreta = 0, nivelAtual = 6;
+        let inputs = { 1: "", 2: "" };
+        const forca = 12, limite = 45;
+
+        function iniciarJogo(n) {
+            nivelAtual = n;
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('jogo').style.display = 'flex';
+            posicao = 0;
+            atualizarCorda();
+            gerarQuestao();
+        }
+
+        function digitar(id, char) {
+            inputs[id] += char;
+            document.getElementById(`display-j${id}`).innerText = inputs[id];
+        }
+
+        function limpar(id) {
+            inputs[id] = "";
+            document.getElementById(`display-j${id}`).innerText = "";
+        }
+
+        function confirmar(id) {
+            let valUser = parseFloat(inputs[id].replace(',', '.'));
+            if (Math.abs(valUser - respostaCorreta) < 0.01) {
+                posicao += (id === 1) ? -forca : forca;
+                atualizarCorda();
+                if (Math.abs(posicao) >= limite) {
+                    alert("VITÓRIA DO JOGADOR " + id + "!");
+                    location.reload();
+                } else {
+                    gerarQuestao();
+                }
+            } else {
+                let display = document.getElementById(`display-j${id}`);
+                display.style.borderColor = "red";
+                setTimeout(() => { display.style.borderColor = "#444"; limpar(id); }, 400);
+            }
+        }
+
+        function atualizarCorda() {
+            document.getElementById('corda').style.transform = `translateX(${posicao}%)`;
+        }
+
+        function gerarQuestao() {
+            inputs = { 1: "", 2: "" };
+            document.getElementById('display-j1').innerText = "";
+            document.getElementById('display-j2').innerText = "";
+            const container = document.getElementById('questao-container');
+            let a, b, x, op;
+
+            switch(nivelAtual) {
+                case 6:
+                    a = Math.floor(Math.random()*30)+10; b = Math.floor(Math.random()*20)+5;
+                    op = Math.random() > 0.5 ? "+" : "-";
+                    respostaCorreta = op === "+" ? a + b : a - b;
+                    container.innerText = `${a} ${op} ${b}`;
+                    break;
+                case 7:
+                    a = Math.floor(Math.random()*20)-10; b = Math.floor(Math.random()*20)-10;
+                    op = Math.random() > 0.5 ? "+" : "-";
+                    respostaCorreta = op === "+" ? a + b : a - b;
+                    container.innerText = `(${a}) ${op} (${b})`;
+                    break;
+                case 8:
+                    if(Math.random() > 0.5) {
+                        a = Math.floor(Math.random()*12)+2;
+                        container.innerHTML = `${a}<sup>2</sup>`;
+                        respostaCorreta = a * a;
+                    } else {
+                        const r = [16,25,36,49,64,81,100];
+                        a = r[Math.floor(Math.random()*r.length)];
+                        container.innerText = `√${a}`;
+                        respostaCorreta = Math.sqrt(a);
+                    }
+                    break;
+                case 9:
+                    a = Math.floor(Math.random()*4)+2; x = Math.floor(Math.random()*10)+1; b = Math.floor(Math.random()*10)+1;
+                    container.innerText = `${a}x + ${b} = ${a*x+b}`;
+                    respostaCorreta = x;
+                    break;
+                case 10:
+                    const tipo = Math.floor(Math.random()*3);
+                    if(tipo === 0) { // Log
+                        const base = [2,3,5,10][Math.floor(Math.random()*4)];
+                        const ex = Math.floor(Math.random()*3)+1;
+                        container.innerHTML = `log<sub>${base}</sub>(${Math.pow(base,ex)})`;
+                        respostaCorreta = ex;
+                    } else if(tipo === 1) { // Trig
+                        container.innerText = "sen(30°) + cos(60°)";
+                        respostaCorreta = 1;
+                    } else { // Decimal
+                        a = (Math.random()*4+1).toFixed(1);
+                        container.innerText = `${a} + ${a}`;
+                        respostaCorreta = parseFloat(a)*2;
+                    }
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
